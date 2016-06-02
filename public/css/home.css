@@ -1,0 +1,31 @@
+*{
+	font-family: 'Roboto', sans-serif;
+}
+
+table{
+	border-collapse:collapse;
+	border:1px solid #000000;
+}
+
+colgroup, tbody { 
+	border: solid medium; 
+}
+
+td {
+	border: solid thin;
+	height: 2.4em;
+	width: 2.4em;
+	text-align: center;
+	padding: 0;
+}
+
+input[type=text]{
+	-webkit-appearance: none;
+	outline: none;
+	border: none;
+	color: #000000;
+	display: table-cell;
+	margin-left: 1em;
+	font-size: 84%;
+	font-weight: bold;
+}

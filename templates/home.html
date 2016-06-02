@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="description" content="Sudoku solver written in Go">
+		<meta name="author" content="Tristan S.">
+		<meta name="keywords" content="Go, Golang, sudoku">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="/scripts/home.js"></script>
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/css/home.css">
+		<title>Online Sudoku solver</title>
+	</head>
+
+	<body>
+		<h1>Sudoku Solver</h1>
+		<article>
+			<p>
+				The solver will attempt to find a solution to the provided puzzle by using a backtracking algorithm. It is possible that no solution will be found.
+			</p>
+			<p>
+				This website is being served with Golang.
+			</p>
+		</article>
+		<form action="./home.html" method="POST">
+			<table>
+  				<colgroup><col><col><col>
+  				<colgroup><col><col><col>
+  				<colgroup><col><col><col>
+  				<tbody>
+		 			{{ range loop 3}}
+		 			<tr>
+		 				{{ range loop 9}} 
+		 				<td> <input value="1" type="text" name="value[]" maxlength="1" size="1">
+		 				{{end}}
+		 			{{end}}
+	  			<tbody>
+		 			{{ range loop 3}}
+		 			<tr>
+		 				{{ range loop 9}} 
+		 				<td> <input value="1" type="text" name="value[]" maxlength="1" size="1">
+		 				{{end}}
+		 			{{end}}
+	  			<tbody>
+		 			{{ range loop 3}}
+		 			<tr>
+		 				{{ range loop 9}} 
+		 				<td> <input value="1" type="text" name="value[]" maxlength="1" size="1">
+		 				{{end}}
+		 			{{end}}
+			</table>
+			<input type="submit" value="Solve" name="solve">
+		</form>
+
+	</body>
+
+</html>
