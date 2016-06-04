@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/tri125/sudoku"
 	"html/template"
@@ -9,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 )
+
+var t *template.Template = ParseTemplates()
 
 func main() {
 	var port int = 4040
@@ -29,18 +30,29 @@ func main() {
 
 }
 
-func HomeHandler(w http.ResponseWriter, req *http.Request) {
+func ParseTemplates() *template.Template {
 	t := template.New("home.html").Funcs(template.FuncMap{
 		"loop": func(n int) []struct{} {
 			return make([]struct{}, n)
 		},
+	}).Funcs(template.FuncMap{
+		"each": func(interval int, n int) bool {
+			return n%interval == 0
+		},
 	})
+
 	t, err := t.ParseFiles("templates/home.html")
 
 	if err != nil {
 		log.Print("template/home error:", err)
 	}
-	t.ExecuteTemplate(w, "home.html", nil)
+
+	return t
+}
+
+func HomeHandler(w http.ResponseWriter, req *http.Request) {
+	var gridValue [81]string
+	t.ExecuteTemplate(w, "home.html", gridValue)
 }
 
 func SolveHandler(w http.ResponseWriter, req *http.Request) {
@@ -59,7 +71,7 @@ func SolveHandler(w http.ResponseWriter, req *http.Request) {
 		}
 
 	}
-
+	log.Print("AH:", gridPost[0] == "")
 	if gridPost != nil {
 		var grid sudoku.Grid
 		var count int = 0
@@ -73,16 +85,25 @@ func SolveHandler(w http.ResponseWriter, req *http.Request) {
 				count++
 			}
 		}
-		/*grid, err := sudoku.SolveGrid(grid)
+		grid, err := sudoku.SolveGrid(grid)
 		if err != nil {
 			log.Print("Sudoku Grid Solver error:", err)
-		}*/
-		jsonResponse, err := json.Marshal(grid)
+		}
+		//jsonResponse, err := json.Marshal(grid)
 
 		if err != nil {
 			log.Print("Error:", err)
 		}
-		w.Write(jsonResponse)
+		var flatGrid [81]int
+		count = 0
+		for x := 0; x < len(grid); x++ {
+			for y := 0; y < len(grid[x]); y++ {
+				flatGrid[count] = grid[x][y]
+				count++
+			}
+		}
+		//w.Write(jsonResponse)
+		t.ExecuteTemplate(w, "home.html", flatGrid)
 	}
 
 }

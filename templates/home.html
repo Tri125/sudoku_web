@@ -27,31 +27,18 @@
   				<colgroup><col><col><col>
   				<colgroup><col><col><col>
   				<colgroup><col><col><col>
-  				<tbody>
-		 			{{ range loop 3}}
-		 			<tr>
-		 				{{ range loop 9}} 
-		 				<td> <input value="1" type="text" name="value[]" maxlength="1" size="1">
-		 				{{end}}
-		 			{{end}}
+		 		{{ range $index, $value := . }}
+		 		{{ if each 27 $index }}
 	  			<tbody>
-		 			{{ range loop 3}}
+	  			{{ end }}
+		 			{{ if each 9 $index}}
 		 			<tr>
-		 				{{ range loop 9}} 
-		 				<td> <input value="1" type="text" name="value[]" maxlength="1" size="1">
-		 				{{end}}
-		 			{{end}}
-	  			<tbody>
-		 			{{ range loop 3}}
-		 			<tr>
-		 				{{ range loop 9}} 
-		 				<td> <input value="1" type="text" name="value[]" maxlength="1" size="1">
-		 				{{end}}
-		 			{{end}}
+		 			{{ end }}
+		 				<td> <input value="{{ $value }}" type="text" name="value[]" maxlength="1" size="1">
+		 		{{end}}
 			</table>
 			<input type="submit" value="Solve" name="solve">
 		</form>
-
 	</body>
 
 </html>
