@@ -2,7 +2,13 @@
 	font-family: 'Roboto', sans-serif;
 }
 
+body{
+	display: block;
+	background-color: #fafafa;
+}
+
 table{
+	background: white;
 	border-collapse:collapse;
 	border:1px solid #000000;
 }
@@ -13,8 +19,8 @@ colgroup, tbody {
 
 td {
 	border: solid thin;
-	height: 2.4em;
-	width: 2.4em;
+	height: 2.8em;
+	width: 2.8em;
 	text-align: center;
 	padding: 0;
 }
@@ -28,4 +34,9 @@ input[type=text]{
 	margin-left: 1em;
 	font-size: 84%;
 	font-weight: bold;
+}
+
+input[type=submit]{
+	margin-top: 1em;
+	width: 7em;
 }

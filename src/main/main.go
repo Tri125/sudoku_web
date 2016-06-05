@@ -9,16 +9,22 @@ import (
 	"strconv"
 )
 
+//Parse our templates
 var t *template.Template = ParseTemplates()
 
 func main() {
+	//Port that the app will listen for requests
 	var port int = 4040
 	portString := strconv.Itoa(port)
-
+	//Create the Gorilla Mux
 	r := mux.NewRouter()
+	//Handler for Root GET
 	r.HandleFunc("/", HomeHandler).Methods("GET")
+	//Handler for Root POST
 	r.HandleFunc("/", SolveHandler).Methods("POST")
+	//To be able to serve public files
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public/")))
+
 	http.Handle("/", r)
 
 	log.Print("Listening on port " + portString)
@@ -30,6 +36,8 @@ func main() {
 
 }
 
+//ParseTemplates return a pointer to a Template type.
+//All templates are initialized in this function.
 func ParseTemplates() *template.Template {
 	t := template.New("home.html").Funcs(template.FuncMap{
 		"loop": func(n int) []struct{} {
@@ -44,17 +52,21 @@ func ParseTemplates() *template.Template {
 	t, err := t.ParseFiles("templates/home.html")
 
 	if err != nil {
-		log.Print("template/home error:", err)
+		log.Fatal("template/home error:", err)
 	}
 
 	return t
 }
 
+//HomeHandler handle GET requests on the root directory
 func HomeHandler(w http.ResponseWriter, req *http.Request) {
+	//String array of 81 elements representing the values for an empty sudoku grid.
 	var gridValue [81]string
 	t.ExecuteTemplate(w, "home.html", gridValue)
 }
 
+//SolveHandler handle POST requests on the root directory
+//Responsible to manipulate POST form data and present to the user a solved sudoku grid.
 func SolveHandler(w http.ResponseWriter, req *http.Request) {
 	err := req.ParseForm()
 	var gridPost []string
@@ -63,47 +75,66 @@ func SolveHandler(w http.ResponseWriter, req *http.Request) {
 		log.Print("SolveHandler ParseForm error:", err)
 	}
 
+	//Retrieve the POST data for our "value[]" input elements.
 	for key, values := range req.PostForm {
 		if key == "value[]" {
+			//Contain a string array
 			gridPost = values
 		} else {
 			continue
 		}
 
 	}
-	log.Print("AH:", gridPost[0] == "")
+
 	if gridPost != nil {
-		var grid sudoku.Grid
-		var count int = 0
-		for x := 0; x < len(grid); x++ {
-			for y := 0; y < len(grid[x]); y++ {
-				gridValue, err := strconv.Atoi(gridPost[count])
-				if err != nil {
-					log.Print("Post grid atoi error:", err)
-				}
-				grid[x][y] = gridValue
-				count++
-			}
-		}
-		grid, err := sudoku.SolveGrid(grid)
-		if err != nil {
-			log.Print("Sudoku Grid Solver error:", err)
-		}
-		//jsonResponse, err := json.Marshal(grid)
+		solvedGrid, err := SolvePost(gridPost)
 
 		if err != nil {
-			log.Print("Error:", err)
+			log.Print("Error handling Post and solving:", err)
 		}
-		var flatGrid [81]int
-		count = 0
-		for x := 0; x < len(grid); x++ {
-			for y := 0; y < len(grid[x]); y++ {
-				flatGrid[count] = grid[x][y]
-				count++
-			}
-		}
-		//w.Write(jsonResponse)
+		flatGrid := FlattenGrid(solvedGrid)
 		t.ExecuteTemplate(w, "home.html", flatGrid)
 	}
 
+}
+
+//SolvePost accept an array of string, convert it to a sudoku.Grid type and solve the grid.
+//Returns the solved Grid and error if applicable.
+func SolvePost(gridPost []string) (answer sudoku.Grid, err error) {
+	var grid sudoku.Grid
+	var count int = 0
+
+	//Itterate on the 2d array and assign its values.
+	for x := 0; x < len(grid); x++ {
+		for y := 0; y < len(grid[x]); y++ {
+			gridValue, err := strconv.Atoi(gridPost[count])
+			if err != nil {
+				log.Print("Post grid atoi error:", err)
+			}
+			grid[x][y] = gridValue
+			count++
+		}
+	}
+
+	//Solve the grid
+	grid, err2 := sudoku.SolveGrid(grid)
+	if err2 != nil {
+		log.Print("Sudoku Grid Solver error:", err)
+	}
+
+	return grid, nil
+}
+
+//FlattenGrid take a sudoku Grid type (2d int array) and flatten it in one dimension.
+//Return an int array.
+func FlattenGrid(grid sudoku.Grid) (flatGrid [81]int) {
+	var count int = 0
+
+	for x := 0; x < len(grid); x++ {
+		for y := 0; y < len(grid[x]); y++ {
+			flatGrid[count] = grid[x][y]
+			count++
+		}
+	}
+	return flatGrid
 }

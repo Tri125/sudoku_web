@@ -5,7 +5,10 @@
 		<meta name="description" content="Sudoku solver written in Go">
 		<meta name="author" content="Tristan S.">
 		<meta name="keywords" content="Go, Golang, sudoku">
+
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		
 		<script src="/scripts/home.js"></script>
 		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/css/home.css">
@@ -13,32 +16,55 @@
 	</head>
 
 	<body>
-		<h1>Sudoku Solver</h1>
-		<article>
-			<p>
-				The solver will attempt to find a solution to the provided puzzle by using a backtracking algorithm. It is possible that no solution will be found.
-			</p>
-			<p>
-				This website is being served with Golang.
-			</p>
-		</article>
-		<form action="./" method="POST">
-			<table>
-  				<colgroup><col><col><col>
-  				<colgroup><col><col><col>
-  				<colgroup><col><col><col>
-		 		{{ range $index, $value := . }}
-		 		{{ if each 27 $index }}
-	  			<tbody>
-	  			{{ end }}
-		 			{{ if each 9 $index}}
-		 			<tr>
-		 			{{ end }}
-		 				<td> <input value="{{ $value }}" type="text" name="value[]" maxlength="1" size="1">
-		 		{{end}}
-			</table>
-			<input type="submit" value="Solve" name="solve">
-		</form>
+		<a href="https://github.com/tri125/sudoku_web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-12 col-md-12">
+					<div class="header clearfix">
+						<h3 class="text-muted">Sudoku Solver</h3>
+					</div>
+					<div class="jumbotron">
+						<article>
+							<p>
+								The solver will attempt to find a solution to the provided puzzle by using a backtracking algorithm.<br>
+								<strong>It is possible that no solution will be found.</strong>
+							</p>
+							<p>
+								This web app has been written in Golang as an exercise to learn the language and discover its capabilities.
+							</p>
+						</article>
+					</div>
+					<div class="row">
+						<div class="col-sm-6 col-md-4">
+						</div>
+						<div class="col-sm-6 col-md-6">
+							<form action="./" method="POST">
+								<table>
+  									<colgroup><col><col><col>
+  									<colgroup><col><col><col>
+  									<colgroup><col><col><col>
+		 							{{ range $index, $value := . }}
+		 							{{ if each 27 $index }}
+	  								<tbody>
+	  								{{ end }}
+		 								{{ if each 9 $index}}
+		 								<tr>
+		 								{{ end }}
+		 								<td> <input value="{{ $value }}" type="text" name="value[]" maxlength="1" size="1"> </td>
+		 							{{end}}
+								</table>
+								<div class="row">
+									<div class="col-sm-12 col-md-3">
+									</div>
+									<div class="col-sm-12 col-md-6">
+										<input type="submit" value="Solve" name="solve">
+									</div>
+								</div>
+							</form>
+						</div> <!-- div of col table-->
+					</div> <!-- div of row -->
+				</div> <!-- main div of col -->
+			</div> <!-- main row -->
 	</body>
 
 </html>
