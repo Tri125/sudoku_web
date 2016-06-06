@@ -127,12 +127,17 @@ func SolvePost(gridPost []string) (answer sudoku.Grid, err error) {
 		}
 	}
 
-	//Solve the grid
+	//Solve the grid in a different goroutine
 	go _solveGrid(grid, ch)
 
+	//Execute which ever case is first available.
+	//Either the puzzle gets solved, or there is a timeout in 5 secs.
 	select {
+	//The channel ch have a result, store it in a variable
 	case solvedGrid := <-ch:
+		//Return result
 		return solvedGrid, nil
+	//Get result on a channel after 5 seconds.
 	case <-time.After(5 * time.Second):
 		return grid, errors.New("TimeOut")
 	}
@@ -146,6 +151,7 @@ func _solveGrid(grid sudoku.Grid, ch chan sudoku.Grid) {
 	if err != nil {
 		log.Print("Sudoku Grid Solver error:", err)
 	}
+	//Write the result in the channel regardless if it was solved or not
 	ch <- grid
 }
 
