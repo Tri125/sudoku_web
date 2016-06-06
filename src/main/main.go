@@ -7,7 +7,9 @@ import (
 	"github.com/tri125/sudoku"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -22,9 +24,13 @@ func main() {
 	//Port that the app will listen for requests
 	var port int = 4040
 	portString := strconv.Itoa(port)
-
+	var logErr error
 	//Set lumber
-	logger, _ = lumber.NewFileLogger("filename.log", lumber.INFO, lumber.ROTATE, 5000, 9, 100)
+	logger, logErr = lumber.NewFileLogger("filename.log", lumber.INFO, lumber.ROTATE, 5000, 9, 100)
+
+	if logErr != nil {
+		log.Fatal("Logger failed to start: ", logErr)
+	}
 	//Create the Gorilla Mux
 	r := mux.NewRouter()
 	//Handler for Root GET
@@ -37,12 +43,13 @@ func main() {
 	http.Handle("/", r)
 
 	log.Print("Listening on port " + portString)
+	lumber.Info("Listening on port " + portString)
 
 	err := http.ListenAndServe(":"+portString, nil)
 	if err != nil {
+		lumber.Fatal("ListenAndServe error:", err)
 		log.Fatal("ListenAndServe error:", err)
 	}
-
 }
 
 //ParseTemplates return a pointer to a Template type.
@@ -77,6 +84,7 @@ func HomeHandler(w http.ResponseWriter, req *http.Request) {
 //SolveHandler handle POST requests on the root directory
 //Responsible to manipulate POST form data and present to the user a solved sudoku grid.
 func SolveHandler(w http.ResponseWriter, req *http.Request) {
+	ip, _, _ := net.SplitHostPort(req.RemoteAddr)
 	err := req.ParseForm()
 	var gridPost []string
 
@@ -96,15 +104,38 @@ func SolveHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if gridPost != nil {
-		solvedGrid, err := SolvePost(gridPost)
+		isValid := ValidatePost(gridPost)
 
-		if err != nil {
-			log.Print("Error handling Post and solving:", err)
+		if isValid {
+			solvedGrid, err := SolvePost(gridPost)
+
+			if err != nil {
+				log.Print("Error solving: ", err)
+				logger.Error("Error solving: ", err)
+			}
+			flatGrid := FlattenGrid(solvedGrid)
+			t.ExecuteTemplate(w, "home.html", flatGrid)
+		} else {
+			log.Print(ip, " POST failed validation: ", gridPost)
+			logger.Warn("IP: %s. POST failed validation: %s", ip, gridPost)
+			t.ExecuteTemplate(w, "home.html", gridPost)
 		}
-		flatGrid := FlattenGrid(solvedGrid)
-		t.ExecuteTemplate(w, "home.html", flatGrid)
+
 	}
 
+}
+
+//ValidatePost takes an array of string and validate the data
+//Return true if valid, otherwise return false
+func ValidatePost(gridPost []string) bool {
+	//Each field is either empty or contain a value from 1-9
+	validationRegex := regexp.MustCompile("^([1-9]?)$")
+	for _, value := range gridPost {
+		if !validationRegex.MatchString(value) {
+			return false
+		}
+	}
+	return true
 }
 
 //SolvePost accept an array of string, convert it to a sudoku.Grid type and solve the grid.
@@ -117,11 +148,7 @@ func SolvePost(gridPost []string) (answer sudoku.Grid, err error) {
 	//Itterate on the 2d array and assign its values.
 	for x := 0; x < len(grid); x++ {
 		for y := 0; y < len(grid[x]); y++ {
-			gridValue, err := strconv.Atoi(gridPost[count])
-			if err != nil {
-				logger.Warn(err.Error())
-				log.Print("Post grid atoi error:", err)
-			}
+			gridValue, _ := strconv.Atoi(gridPost[count])
 			grid[x][y] = gridValue
 			count++
 		}
