@@ -1,5 +1,11 @@
 $(document).ready(function() {
 
+	//To empty the Sudoku Grid
+	$("#emptyBtn").click(function(){
+		$("input[type='text']").val("");
+	});
+
+
 	//Select the text input when clicking it
 	$("input[type='text']").click(function(){
 		$(this).select();
