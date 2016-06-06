@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/gorilla/mux"
 	lumber "github.com/jcelliott/lumber"
 	"github.com/tri125/sudoku"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 //Lumber logger
@@ -126,12 +128,25 @@ func SolvePost(gridPost []string) (answer sudoku.Grid, err error) {
 	}
 
 	//Solve the grid
-	grid, err2 := sudoku.SolveGrid(grid, ch)
-	if err2 != nil {
-		log.Print("Sudoku Grid Solver error:", err2)
+	go _solveGrid(grid, ch)
+
+	select {
+	case solvedGrid := <-ch:
+		return solvedGrid, nil
+	case <-time.After(5 * time.Second):
+		return grid, errors.New("TimeOut")
 	}
 
 	return grid, nil
+}
+
+func _solveGrid(grid sudoku.Grid, ch chan sudoku.Grid) {
+	grid, err := sudoku.SolveGrid(grid)
+
+	if err != nil {
+		log.Print("Sudoku Grid Solver error:", err)
+	}
+	ch <- grid
 }
 
 //FlattenGrid take a sudoku Grid type (2d int array) and flatten it in one dimension.
