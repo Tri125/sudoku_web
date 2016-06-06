@@ -2,12 +2,16 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	lumber "github.com/jcelliott/lumber"
 	"github.com/tri125/sudoku"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 )
+
+//Lumber logger
+var logger lumber.Logger
 
 //Parse our templates
 var t *template.Template = ParseTemplates()
@@ -16,6 +20,9 @@ func main() {
 	//Port that the app will listen for requests
 	var port int = 4040
 	portString := strconv.Itoa(port)
+
+	//Set lumber
+	logger, _ = lumber.NewFileLogger("filename.log", lumber.INFO, lumber.ROTATE, 5000, 9, 100)
 	//Create the Gorilla Mux
 	r := mux.NewRouter()
 	//Handler for Root GET
@@ -103,12 +110,14 @@ func SolveHandler(w http.ResponseWriter, req *http.Request) {
 func SolvePost(gridPost []string) (answer sudoku.Grid, err error) {
 	var grid sudoku.Grid
 	var count int = 0
+	ch := make(chan sudoku.Grid, 1)
 
 	//Itterate on the 2d array and assign its values.
 	for x := 0; x < len(grid); x++ {
 		for y := 0; y < len(grid[x]); y++ {
 			gridValue, err := strconv.Atoi(gridPost[count])
 			if err != nil {
+				logger.Warn(err.Error())
 				log.Print("Post grid atoi error:", err)
 			}
 			grid[x][y] = gridValue
@@ -117,9 +126,9 @@ func SolvePost(gridPost []string) (answer sudoku.Grid, err error) {
 	}
 
 	//Solve the grid
-	grid, err2 := sudoku.SolveGrid(grid)
+	grid, err2 := sudoku.SolveGrid(grid, ch)
 	if err2 != nil {
-		log.Print("Sudoku Grid Solver error:", err)
+		log.Print("Sudoku Grid Solver error:", err2)
 	}
 
 	return grid, nil
