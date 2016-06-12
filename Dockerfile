@@ -17,4 +17,4 @@ RUN go get github.com/tri125/sudoku
 RUN go build $APP_DIR/src/main/main.go
 
 EXPOSE 4040
-CMD [ "sh", "-c", "go", "run", "${APP_DIR}/src/main/main.go"]
+CMD [ "sh", "-c", "go run ${APP_DIR}/src/main/main.go"]
