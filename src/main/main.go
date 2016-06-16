@@ -22,7 +22,7 @@ var t *template.Template = ParseTemplates()
 
 func main() {
 	//Port that the app will listen for requests
-	var port int = 4040
+	var port int = 80
 	portString := strconv.Itoa(port)
 	var logErr error
 	//Set lumber
