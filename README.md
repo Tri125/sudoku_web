@@ -17,6 +17,12 @@ In the main function of the file main.go edit the port number to whichever port 
 
 The default port is 80.
 
+~~~
+func main() {
+	//Port that the app will listen for requests
+	var port int = 80
+~~~
+
 ## Installation
 
 You can compile and run the code directly from a Linux machine with Go 1.6 installed or you can create a Docker image from the provided Dockerfile.
