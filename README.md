@@ -5,6 +5,8 @@ The solving algorithm is a recursive backtracking algorithm, allowing fast solvi
 
 In the current version, net/http handle all the web aspect of the apps.
 
+![Running sudoku_web](https://i.imgur.com/i8yqkrj.png)
+
 ## Dependencies
 * Go 1.6 
 * gorilla/mux for routing
