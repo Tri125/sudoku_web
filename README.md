@@ -54,13 +54,13 @@ If you don't have Go installed on your machine you might prefer creating a docke
 
 The sudoku_web Docker image is based from Linux wheezy which can make the image sizeable (650 MB for the base image).
 
-Build the image:
+**Build the image:**
 ~~~~
 docker build -t sudoku_web .
 ~~~~
 The Dockerfile will handle most of the work for you and will create an image with the name "sudoku_web".
 
-Create & run a container:
+**Create & run a container:**
 ~~~~
 docker run -d -p 80:80 sudoku_web
 ~~~~
